@@ -5,17 +5,17 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
     [SerializeField] private float moveSpeed;
-    [SerializeField] private float rotateSpeed;
 
     private InputManager input = null;
     private Vector2 moveVector = Vector2.zero;
     private Rigidbody2D rb = null;
+    private SpriteRenderer rbSprite = null;
 
     private void Awake() {
         moveSpeed = 500f;
-        rotateSpeed = 7f;
         input = new InputManager();
         rb = GetComponent<Rigidbody2D>();
+        rbSprite = GetComponent<SpriteRenderer>();
     }
 
     private void OnEnable() {
@@ -30,6 +30,11 @@ public class PlayerController : MonoBehaviour {
 
     private void Move_performed(InputAction.CallbackContext ctx) {
         moveVector = ctx.ReadValue<Vector2>().normalized;
+        if (moveVector.x < 0) {
+            rbSprite.flipX = true;
+        } else if (moveVector.x > 0){
+            rbSprite.flipX = false;
+        }
     }
 
     private void Move_canceled(InputAction.CallbackContext ctx) {
