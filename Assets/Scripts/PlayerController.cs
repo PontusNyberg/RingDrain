@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour {
     private SpriteRenderer rbSprite = null;
 
     private void Awake() {
-        moveSpeed = 500f;
+        moveSpeed = 5;
         input = new InputManager();
         rb = GetComponent<Rigidbody2D>();
         rbSprite = GetComponent<SpriteRenderer>();
@@ -25,11 +25,12 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        rb.velocity = moveVector * moveSpeed * Time.deltaTime;
+        rb.velocity = moveVector * moveSpeed * 100f * Time.fixedDeltaTime;
     }
 
     private void Move_performed(InputAction.CallbackContext ctx) {
         moveVector = ctx.ReadValue<Vector2>().normalized;
+
         if (moveVector.x < 0) {
             rbSprite.flipX = true;
         } else if (moveVector.x > 0){
