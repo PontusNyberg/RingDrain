@@ -11,8 +11,8 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody2D rb = null;
     private SpriteRenderer rbSprite = null;
 
-    private void Awake() {
-        moveSpeed = 5;
+    private void Awake() {        
+        moveSpeed = 3;
         input = new InputManager();
         rb = GetComponent<Rigidbody2D>();
         rbSprite = GetComponent<SpriteRenderer>();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,19 +8,29 @@ public class AiChase : MonoBehaviour {
     [SerializeField] private float speed;
     [SerializeField] private float distanceForChase;
     [SerializeField] private ContactFilter2D movementFilter;
+    [SerializeField] private float playerDmgRadius;
 
     private Rigidbody2D rb;
     private float distance;
     private List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
+    private int damageFrameCounter;
+    private bool dmgInEffect;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
         distanceForChase = 12f;
+        playerDmgRadius = 2f;
     }
 
 
     private void FixedUpdate() {
         distance = Vector2.Distance(transform.position, player.transform.position);
+
+
+        if(distance < playerDmgRadius && !dmgInEffect) {
+            StartCoroutine(DamagePlayer());
+        }
+
         Vector2 direction = player.transform.position - transform.position;
         direction.Normalize();
 
@@ -33,6 +44,16 @@ public class AiChase : MonoBehaviour {
                 moveSucceded = MoveAi(new Vector2(0, direction.y));
             }
         }
+    }
+
+    private IEnumerator DamagePlayer() {
+        if (distance < playerDmgRadius) {
+            player.GetComponent<Health>().DamagePlayer(10);
+            dmgInEffect = true;
+            yield return new WaitForSeconds(1);
+        }
+        dmgInEffect = false;
+        yield return null;
     }
 
     private bool MoveAi(Vector2 direction) {
