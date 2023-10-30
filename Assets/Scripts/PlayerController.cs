@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
+    public static PlayerController Instance { get; private set; }
+
     [SerializeField] private float moveSpeed;
 
     private InputManager input = null;
@@ -11,7 +13,9 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody2D rb = null;
     private SpriteRenderer rbSprite = null;
 
-    private void Awake() {        
+    private void Awake() {
+        Instance = this;
+
         moveSpeed = 3;
         input = new InputManager();
         rb = GetComponent<Rigidbody2D>();
@@ -23,8 +27,18 @@ public class PlayerController : MonoBehaviour {
         input.Player.Move.performed += Move_performed;
         input.Player.Move.canceled += Move_canceled;
     }
+    private void OnDisable() {
+        input.Disable();
+        input.Player.Move.performed -= Move_performed;
+        input.Player.Move.canceled -= Move_canceled;
+    }
 
     private void FixedUpdate() {
+        if (!GameManager.Instance.IsGamePlaying()) {
+            moveVector = Vector2.zero;
+            return;
+        }
+
         rb.velocity = moveVector * moveSpeed * 100f * Time.fixedDeltaTime;
     }
 
@@ -40,11 +54,5 @@ public class PlayerController : MonoBehaviour {
 
     private void Move_canceled(InputAction.CallbackContext ctx) {
         moveVector = Vector2.zero;
-    }
-
-    private void OnDisable() {
-        input.Disable();
-        input.Player.Move.performed -= Move_performed;
-        input.Player.Move.canceled -= Move_canceled;
     }
 }

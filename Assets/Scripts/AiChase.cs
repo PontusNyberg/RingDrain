@@ -24,6 +24,9 @@ public class AiChase : MonoBehaviour {
 
 
     private void FixedUpdate() {
+        if (!GameManager.Instance.IsGamePlaying())
+            return;
+
         distance = Vector2.Distance(transform.position, player.transform.position);
 
 
@@ -48,7 +51,7 @@ public class AiChase : MonoBehaviour {
 
     private IEnumerator DamagePlayer() {
         if (distance < playerDmgRadius) {
-            player.GetComponent<Health>().DamagePlayer(10);
+            player.GetComponent<Health>().DamagePlayer(50);
             dmgInEffect = true;
             yield return new WaitForSeconds(1);
         }
