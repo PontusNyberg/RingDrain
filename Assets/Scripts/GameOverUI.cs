@@ -1,12 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameOverUI : MonoBehaviour {
+    [SerializeField] private Button PlayAgainButton;
+    [SerializeField] private Button ExitButton;
+
     private void Start() {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
 
         Hide();
+
+        PlayAgainButton.onClick.AddListener(() => {
+            HealthBar.Instance.ResetHealthBar();
+            GameManager.Instance.ResetState();
+        });
+
+        ExitButton.onClick.AddListener(() => { 
+            Application.Quit();
+        });
     }
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e) {

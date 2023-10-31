@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class PlayerController : MonoBehaviour {
     private Vector2 moveVector = Vector2.zero;
     private Rigidbody2D rb = null;
     private SpriteRenderer rbSprite = null;
+    private Vector2 spawnPoint;
 
     private void Awake() {
         Instance = this;
@@ -20,6 +22,19 @@ public class PlayerController : MonoBehaviour {
         input = new InputManager();
         rb = GetComponent<Rigidbody2D>();
         rbSprite = GetComponent<SpriteRenderer>();
+        spawnPoint = rb.position;
+    }
+
+    private void Start() {
+        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+    }
+
+    private void GameManager_OnStateChanged(object sender, EventArgs e) {
+        if (GameManager.Instance.IsCountdownToStartActive()) {
+            moveVector = Vector2.zero;
+            rb.velocity = Vector2.zero;
+            rb.position = spawnPoint;
+        }
     }
 
     private void OnEnable() {
@@ -27,6 +42,7 @@ public class PlayerController : MonoBehaviour {
         input.Player.Move.performed += Move_performed;
         input.Player.Move.canceled += Move_canceled;
     }
+
     private void OnDisable() {
         input.Disable();
         input.Player.Move.performed -= Move_performed;

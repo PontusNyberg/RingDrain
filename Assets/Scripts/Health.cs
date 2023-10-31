@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 public class Health : MonoBehaviour {
-
     public int curHealth = 0;
     public int maxHealth = 100;
     public HealthBar healthBar;
@@ -20,5 +19,10 @@ public class Health : MonoBehaviour {
         if(curHealth <= 0f) {
             OnHealthEmpty?.Invoke(this, new EventArgs());
         }
+    }
+
+    public void ResetHealth() {
+        curHealth = maxHealth;
+        healthBar.SetHealth(curHealth);
     }
 }

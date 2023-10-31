@@ -13,23 +13,31 @@ public class AiChase : MonoBehaviour {
     private Rigidbody2D rb;
     private float distance;
     private List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
-    private int damageFrameCounter;
     private bool dmgInEffect;
+    private Vector2 spawnPoint;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
+        spawnPoint = rb.position;
         distanceForChase = 12f;
         playerDmgRadius = 2f;
     }
 
+    private void Start() {
+        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+    }
+
+    private void GameManager_OnStateChanged(object sender, EventArgs e) {
+        if(GameManager.Instance.IsCountdownToStartActive()) {
+            rb.position = spawnPoint;
+        }
+    }
 
     private void FixedUpdate() {
         if (!GameManager.Instance.IsGamePlaying())
             return;
 
         distance = Vector2.Distance(transform.position, player.transform.position);
-
-
         if(distance < playerDmgRadius && !dmgInEffect) {
             StartCoroutine(DamagePlayer());
         }
@@ -38,7 +46,6 @@ public class AiChase : MonoBehaviour {
         direction.Normalize();
 
         bool moveSucceded = MoveAi(direction);
-
         if (!moveSucceded) {
             // Try left / right movement
             moveSucceded = MoveAi(new Vector2(direction.x, 0));
