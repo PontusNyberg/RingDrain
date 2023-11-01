@@ -16,12 +16,15 @@ public class GameManager : MonoBehaviour {
     }
 
     private State state;
-    private float countdownToStartTimer = 3f;
+    private float countDownTostartTimerDefaultVal = 1f;
+    private float countdownToStartTimer;
     private float gamePlayingTimer;
     private float gamePlayingTimerMax = 5f;
 
     private void Awake() {
         Instance = this;
+
+        countdownToStartTimer = countDownTostartTimerDefaultVal;
         state = State.CountdownToStart;
     }
 
@@ -63,7 +66,9 @@ public class GameManager : MonoBehaviour {
     }
 
     public void ResetState() {
+        countdownToStartTimer = countDownTostartTimerDefaultVal;
         state = State.CountdownToStart;
+        OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public bool IsGamePlaying() {

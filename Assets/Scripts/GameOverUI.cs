@@ -9,12 +9,12 @@ public class GameOverUI : MonoBehaviour {
 
     private void Start() {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
-
         Hide();
 
         PlayAgainButton.onClick.AddListener(() => {
             HealthBar.Instance.ResetHealthBar();
             GameManager.Instance.ResetState();
+            Hide();
         });
 
         ExitButton.onClick.AddListener(() => { 

@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
         rbSprite = GetComponent<SpriteRenderer>();
         spawnPoint = rb.position;
+        Debug.Log(rb.position);
     }
 
     private void Start() {
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour {
             moveVector = Vector2.zero;
             rb.velocity = Vector2.zero;
             rb.position = spawnPoint;
+            Debug.Log("Player positions is reset");
         }
     }
 
