@@ -7,7 +7,7 @@ public class HealthBar : MonoBehaviour {
     public static HealthBar Instance { get; private set; }
 
     public Slider healthBar;
-    public Health playerHealth;
+    private Health playerHealth;
 
     private void Awake() {
         Instance = this;

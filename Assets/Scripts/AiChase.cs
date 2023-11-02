@@ -15,22 +15,30 @@ public class AiChase : MonoBehaviour {
     private List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
     private bool dmgInEffect;
     private Vector2 spawnPoint;
+    private Energy unitEnergy;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
         spawnPoint = rb.position;
         distanceForChase = 12f;
         playerDmgRadius = 2f;
+
+        unitEnergy = GetComponent<Energy>();
     }
 
     private void Start() {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+        unitEnergy.OnEnergyEmpty += Energy_OnEnergyEmpty;
     }
 
     private void GameManager_OnStateChanged(object sender, EventArgs e) {
         if(GameManager.Instance.IsCountdownToStartActive()) {
             rb.position = spawnPoint;
         }
+    }
+
+    private void Energy_OnEnergyEmpty(object sender, EventArgs e) {
+        Destroy(gameObject);
     }
 
     private void FixedUpdate() {
@@ -53,7 +61,7 @@ public class AiChase : MonoBehaviour {
             if (!moveSucceded) {
                 moveSucceded = MoveAi(new Vector2(0, direction.y));
             }
-        }
+        }        
     }
 
     private IEnumerator DamagePlayer() {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,6 +9,12 @@ public class PlayerController : MonoBehaviour {
     public static PlayerController Instance { get; private set; }
 
     [SerializeField] private float moveSpeed;
+
+    // For testing out enemy dmg
+    [SerializeField] private GameObject enemy;
+    [SerializeField] private float enemyDmgRadius;
+    private float distance;
+    private bool dmgInEffect;
 
     private InputManager input = null;
     private Vector2 moveVector = Vector2.zero;
@@ -58,6 +65,24 @@ public class PlayerController : MonoBehaviour {
         }
 
         rb.velocity = moveVector * moveSpeed * 100f * Time.fixedDeltaTime;
+
+
+        if (enemy) {
+            distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance < enemyDmgRadius && !dmgInEffect) {
+                StartCoroutine(DamageEnemy());
+            }
+        }
+    }
+
+    private IEnumerator DamageEnemy() {
+        if (distance < enemyDmgRadius) {
+            enemy.GetComponent<Energy>().DamageUnit(50);
+            dmgInEffect = true;
+            yield return new WaitForSeconds(1);
+        }
+        dmgInEffect = false;
+        yield return null;
     }
 
     private void Move_performed(InputAction.CallbackContext ctx) {
