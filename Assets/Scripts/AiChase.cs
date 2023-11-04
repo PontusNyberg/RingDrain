@@ -6,7 +6,6 @@ using UnityEngine;
 public class AiChase : MonoBehaviour {
     [SerializeField] private GameObject player;
     [SerializeField] private float speed;
-    [SerializeField] private float distanceForChase;
     [SerializeField] private ContactFilter2D movementFilter;
     [SerializeField] private float playerDmgRadius;
 
@@ -14,14 +13,16 @@ public class AiChase : MonoBehaviour {
     private float distance;
     private List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
     private bool dmgInEffect;
-    private Vector2 spawnPoint;
-    private Energy unitEnergy;
+    public Energy unitEnergy;
 
     private void Awake() {
+        player = GameObject.Find("Player");
         rb = GetComponent<Rigidbody2D>();
-        spawnPoint = rb.position;
-        distanceForChase = 12f;
-        playerDmgRadius = 2f;
+        playerDmgRadius = 1.5f;
+
+        if(GetComponent<SpriteRenderer>().sprite.name == "happy") {
+            speed = 3f;
+        }
 
         unitEnergy = GetComponent<Energy>();
     }
@@ -32,8 +33,10 @@ public class AiChase : MonoBehaviour {
     }
 
     private void GameManager_OnStateChanged(object sender, EventArgs e) {
-        if(GameManager.Instance.IsCountdownToStartActive()) {
-            rb.position = spawnPoint;
+        if(GameManager.Instance.IsGameOver()) {
+            if(this && gameObject) {
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -85,15 +88,10 @@ public class AiChase : MonoBehaviour {
 
         if (count == 0) {
             // No collisions, free to move
-            if (distance < distanceForChase) {
-                Vector2 newPosition = rb.position + (direction * speed * Time.fixedDeltaTime);
-                rb.MovePosition(newPosition);
+            Vector2 newPosition = rb.position + (direction * speed * Time.fixedDeltaTime);
+            rb.MovePosition(newPosition);
 
-                return true;
-            }
-
-            // Outside range, do nothing
-            return false;
+            return true;
         } else {
             // Collisions detected, do nothing
             return false;

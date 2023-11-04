@@ -4,23 +4,28 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.UI.CanvasScaler;
 
 public class PlayerController : MonoBehaviour {
     public static PlayerController Instance { get; private set; }
 
     [SerializeField] private float moveSpeed;
 
-    // For testing out enemy dmg
-    [SerializeField] private GameObject enemy;
-    [SerializeField] private float enemyDmgRadius;
+    [SerializeField] private LaserController laserPrefab;
+
+    [SerializeField] private Transform atkRadiusUI;
+    [SerializeField] private float enemyDmgRadius = 5f;
     private float distance;
     private bool dmgInEffect;
+    private FindClosest findClosestEnemy;
 
     private InputManager input = null;
     private Vector2 moveVector = Vector2.zero;
     private Rigidbody2D rb = null;
     private SpriteRenderer rbSprite = null;
     private Vector2 spawnPoint;
+
+    private LaserController activeLaser;
 
     private void Awake() {
         Instance = this;
@@ -30,7 +35,9 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
         rbSprite = GetComponent<SpriteRenderer>();
         spawnPoint = rb.position;
-        Debug.Log(rb.position);
+        findClosestEnemy = GetComponent<FindClosest>();
+
+        atkRadiusUI.localScale = new Vector3(enemyDmgRadius, enemyDmgRadius, 0f);
     }
 
     private void Start() {
@@ -38,12 +45,57 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void GameManager_OnStateChanged(object sender, EventArgs e) {
+        if(GameManager.Instance.IsGameOver()) { 
+            MonstersSpawnerControl.spawnAllowed = false;
+        }
         if (GameManager.Instance.IsCountdownToStartActive()) {
             moveVector = Vector2.zero;
             rb.velocity = Vector2.zero;
             rb.position = spawnPoint;
+            MonstersSpawnerControl.spawnAllowed = true;
             Debug.Log("Player positions is reset");
         }
+    }
+
+    private void FixedUpdate() {
+        if (!GameManager.Instance.IsGamePlaying()) {
+            moveVector = Vector2.zero;
+            return;
+        }
+
+        rb.velocity = moveVector * moveSpeed * 100f * Time.fixedDeltaTime;
+
+        AiChase enemy = findClosestEnemy.closestEnemy;
+        if (enemy) {
+            distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance < enemyDmgRadius && !dmgInEffect) {
+                activeLaser?.gameObject.SetActive(false);
+                StartCoroutine(DamageEnemy(enemy));
+            }
+        }
+
+        if(activeLaser) {
+            activeLaser.lineRenderer.SetPosition(0, rb.position);
+            if (enemy && enemy.unitEnergy.curEnergy <= 0f) {
+                activeLaser.gameObject.SetActive(false);
+                activeLaser = null;
+            }
+        }
+    }
+
+    private IEnumerator DamageEnemy(AiChase enemy) {
+        if (distance < enemyDmgRadius) {
+            LaserController newLaser = Instantiate(laserPrefab);
+            newLaser.AssignTarget(rb.position, enemy.transform);
+            activeLaser = newLaser;
+            newLaser.gameObject.SetActive(true);
+
+            enemy.GetComponent<Energy>().DamageUnit(50);
+            dmgInEffect = true;
+            yield return new WaitForSeconds(0.7f);
+        }
+        dmgInEffect = false;
+        yield return null;
     }
 
     private void OnEnable() {
@@ -56,33 +108,6 @@ public class PlayerController : MonoBehaviour {
         input.Disable();
         input.Player.Move.performed -= Move_performed;
         input.Player.Move.canceled -= Move_canceled;
-    }
-
-    private void FixedUpdate() {
-        if (!GameManager.Instance.IsGamePlaying()) {
-            moveVector = Vector2.zero;
-            return;
-        }
-
-        rb.velocity = moveVector * moveSpeed * 100f * Time.fixedDeltaTime;
-
-
-        if (enemy) {
-            distance = Vector2.Distance(transform.position, enemy.transform.position);
-            if (distance < enemyDmgRadius && !dmgInEffect) {
-                StartCoroutine(DamageEnemy());
-            }
-        }
-    }
-
-    private IEnumerator DamageEnemy() {
-        if (distance < enemyDmgRadius) {
-            enemy.GetComponent<Energy>().DamageUnit(50);
-            dmgInEffect = true;
-            yield return new WaitForSeconds(1);
-        }
-        dmgInEffect = false;
-        yield return null;
     }
 
     private void Move_performed(InputAction.CallbackContext ctx) {
