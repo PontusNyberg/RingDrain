@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour {
 
             enemy.GetComponent<Energy>().DamageUnit(50);
             dmgInEffect = true;
-            yield return new WaitForSeconds(0.7f);
+            yield return new WaitForSeconds(0.5f);
         }
         dmgInEffect = false;
         yield return null;

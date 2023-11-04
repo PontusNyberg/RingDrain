@@ -13,6 +13,7 @@ public class AiChase : MonoBehaviour {
     private float distance;
     private List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
     private bool dmgInEffect;
+
     public Energy unitEnergy;
 
     private void Awake() {
@@ -41,6 +42,10 @@ public class AiChase : MonoBehaviour {
     }
 
     private void Energy_OnEnergyEmpty(object sender, EventArgs e) {
+        MonstersSpawnerControl.monsterCount--;
+        ScoreCardUI scoreInstance = ScoreCardUI.Instance;
+        int newScore = scoreInstance.GetScore() + unitEnergy.maxEnergy;
+        scoreInstance.SetScoreText(newScore.ToString());
         Destroy(gameObject);
     }
 
