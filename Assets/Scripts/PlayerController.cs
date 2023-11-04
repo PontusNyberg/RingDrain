@@ -47,6 +47,8 @@ public class PlayerController : MonoBehaviour {
     private void GameManager_OnStateChanged(object sender, EventArgs e) {
         if(GameManager.Instance.IsGameOver()) { 
             MonstersSpawnerControl.spawnAllowed = false;
+            moveVector = Vector2.zero;
+            rb.velocity = Vector2.zero;
         }
         if (GameManager.Instance.IsCountdownToStartActive()) {
             moveVector = Vector2.zero;
