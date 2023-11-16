@@ -23,7 +23,7 @@ public class MonstersSpawnerControl : MonoBehaviour {
     }
 
     void SpawnAMonster() {
-        if(spawnAllowed && monsterCount < 25) {
+        if(spawnAllowed && monsterCount < 45) {
             randomSpawnPoint = Random.Range(0, spawnPoints.Length);
             randomMonster = Random.Range(0, monsters.Length);
             Instantiate(monsters[randomMonster], spawnPoints[randomSpawnPoint].position, Quaternion.identity);

@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour {
     }
 
     private State state;
-    private float countDownTostartTimerDefaultVal = 1f;
+    private float countDownTostartTimerDefaultVal = 3f;
     private float countdownToStartTimer;
     private float gamePlayingTimer;
     private float gamePlayingTimerMax = 30f;
@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour {
                 break;
             case State.CountdownToStart:
                 // During countDown to start game
+                ScoreCardUI.Instance.SetScoreText("0");
                 countdownToStartTimer -= Time.deltaTime;
                 if(countdownToStartTimer < 0f) {
                     state = State.GamePlaying;

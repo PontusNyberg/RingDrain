@@ -1,11 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GameOverUI : MonoBehaviour {
     [SerializeField] private Button PlayAgainButton;
     [SerializeField] private Button ExitButton;
+    [SerializeField] private GameObject ScoreList;
 
     private void Start() {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
